@@ -7,8 +7,14 @@
     android:layout_height="match_parent"
     tools:context="com.rev.rtsimulation.rtsimulation.MainActivity">
 
-    <org.opencv.android.JavaCameraView
-        android:id="@+id/java_camera_view"
+    <!--<org.opencv.android.JavaCameraView-->
+        <!--android:id="@+id/java_camera_view"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:visibility="gone"/>-->
+
+    <com.rev.rtsimulation.rtsimulation.PortraitCameraView
+        android:id="@+id/portrait_camera_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone"/>

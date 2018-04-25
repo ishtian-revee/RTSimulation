@@ -25,7 +25,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     // Field
     private static final String TAG = "MainActivity";
 
-    JavaCameraView javaCameraView;
+//    JavaCameraView javaCameraView;
+    PortraitCameraView portraitCameraView;
     BaseLoaderCallback loaderCallback;
 //    BaseLoaderCallback loaderCallback = new BaseLoaderCallback(this) {
 //        @Override
@@ -49,7 +50,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     Mat imgGray;
     Mat imgCanny;
 
-//    // opencv testing
     static {
 
         System.loadLibrary("opencv_java3");
@@ -69,11 +69,15 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        javaCameraView = findViewById(R.id.java_camera_view);
-        javaCameraView.setVisibility(SurfaceView.VISIBLE);
-        javaCameraView.setCvCameraViewListener(this);
-        javaCameraView.enableView();
-        javaCameraView.enableFpsMeter();
+//        javaCameraView = findViewById(R.id.java_camera_view);
+//        javaCameraView.setVisibility(SurfaceView.VISIBLE);
+//        javaCameraView.setCvCameraViewListener(this);
+//        javaCameraView.enableFpsMeter();
+
+        portraitCameraView = findViewById(R.id.portrait_camera_view);
+        portraitCameraView.setVisibility(SurfaceView.VISIBLE);
+        portraitCameraView.setCvCameraViewListener(this);
+        portraitCameraView.enableFpsMeter();
 
         // Requesting for camera permission manually
         if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1){
@@ -104,14 +108,13 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
                 switch (status){
 
-                    case BaseLoaderCallback.SUCCESS:{
-                        javaCameraView.enableView();
-                    }
+                    case BaseLoaderCallback.SUCCESS:
+//                        javaCameraView.enableView();
+                        portraitCameraView.enableView();
                         break;
 
-                    default: {
+                    default:
                         super.onManagerConnected(status);
-                    }
                         break;
                 }
             }
@@ -123,9 +126,14 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         super.onPause();
 
-        if(javaCameraView != null){
+//        if(javaCameraView != null){
+//
+//            javaCameraView.disableView();
+//        }
 
-            javaCameraView.disableView();
+        if(portraitCameraView != null){
+
+            portraitCameraView.disableView();
         }
     }
 
@@ -134,9 +142,14 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         super.onDestroy();
 
-        if(javaCameraView != null){
+//        if(javaCameraView != null){
+//
+//            javaCameraView.disableView();
+//        }
 
-            javaCameraView.disableView();
+        if(portraitCameraView != null){
+
+            portraitCameraView.disableView();
         }
     }
 
@@ -144,7 +157,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     protected void onResume() {
 
         super.onResume();
-//        loaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
 
         if(OpenCVLoader.initDebug()){
 
