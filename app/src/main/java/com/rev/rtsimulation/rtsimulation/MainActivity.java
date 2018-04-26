@@ -35,8 +35,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 //            switch (status){
 //
 //                case BaseLoaderCallback.SUCCESS:
-//
-//                    javaCameraView.enableView();
+//    //                        javaCameraView.enableView();
+//                    portraitCameraView.enableView();
 //                    break;
 //
 //                default:
@@ -51,15 +51,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     Mat imgCanny;
 
     static {
-
         System.loadLibrary("opencv_java3");
-//        if(OpenCVLoader.initDebug()){
-//
-//            Log.d(TAG, "OpenCV Successfully Loaded!");
-//        } else {
-//
-//            Log.d(TAG, "OpenCV Not Loaded!");
-//        }
     }
 
     @Override
@@ -165,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         } else {
 
             Log.d(TAG, "OpenCV Not Loaded!");
-            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_4_0,
+            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_1_0,
                     this, loaderCallback);
         }
     }
@@ -192,8 +184,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         // Converting to gray image from rgba
         Imgproc.cvtColor(rgba, imgGray, Imgproc.COLOR_RGB2GRAY);
         // Detecting Canny edge
-//        Imgproc.Canny(imgGray, imgCanny, 50, 150);
+        Imgproc.Canny(imgGray, imgCanny, 50, 150);
 
-        return imgGray;
+        return imgCanny;
     }
 }
