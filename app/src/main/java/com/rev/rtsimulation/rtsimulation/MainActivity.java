@@ -27,7 +27,7 @@ import org.opencv.imgproc.Imgproc;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
+public class MainActivity extends AppCompatActivity implements CameraCapture.CameraCallback {
 
     // Fields
     private static final String TAG = "MainActivity";
@@ -54,10 +54,13 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 //    JavaCameraView javaCameraView;
 //    private PortraitCameraView portraitCameraView;
 
-    private Mat rgba;
-    private Mat imgGray;
-    private Mat imgCanny;
-    private Mat hierarchy;
+    private CameraCapture mCameraCapture;
+    Boolean mOpenCVInited = false;
+
+//    private Mat rgba;
+//    private Mat imgGray;
+//    private Mat imgCanny;
+//    private Mat hierarchy;
 
     List<MatOfPoint> contours;
 
@@ -159,54 +162,59 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     }
 
     @Override
-    public void onCameraViewStarted(int width, int height) {
+    public void onUpdateFrame(byte[] data, int fps) {
 
-        rgba = new Mat(height, width, CvType.CV_8UC4);
-        imgGray = new Mat(height, width, CvType.CV_8UC1);
-        imgCanny = new Mat(height, width, CvType.CV_8UC4);
-        hierarchy = new Mat();
     }
 
-    @Override
-    public void onCameraViewStopped() {
-
-        rgba.release();
-        imgGray.release();
-        imgCanny.release();
-        hierarchy.release();
-    }
-
-    @Override
-    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-
-        rgba = inputFrame.rgba();
-        contours = new ArrayList<MatOfPoint>();
-
-        // Converting image from rgba to gray
-        Imgproc.cvtColor(rgba, imgGray, Imgproc.COLOR_RGB2GRAY);
-        // Canny edge detection
-        Imgproc.Canny(imgGray, imgCanny, 50, 150);
-
-        // Finding contours
-        Imgproc.findContours(imgCanny, contours, hierarchy, Imgproc.RETR_TREE,
-                Imgproc.CHAIN_APPROX_SIMPLE, new Point(0, 0));
-
-        Mat drawing = Mat.zeros(imgCanny.size(), CvType.CV_8UC4);
-
-        for(int i=0; i< contours.size(); i++){
-
-            Scalar color = new Scalar(Math.random()*255,
-                    Math.random()*255, Math.random()*255);
-
-            // Drawing contours
-            Imgproc.drawContours(drawing, contours, i, color, 2, 8, hierarchy,
-                    0, new Point() );
-        }
-
-        hierarchy.release();
-//        Imgproc.drawContours(imgGray, contours, -1, new Scalar(Math.random()*255,
-//                Math.random()*255, Math.random()*255)); //, 2, 8, hierarchy, 0, new Point());
-
-        return drawing;
-    }
+//    @Override
+//    public void onCameraViewStarted(int width, int height) {
+//
+//        rgba = new Mat(height, width, CvType.CV_8UC4);
+//        imgGray = new Mat(height, width, CvType.CV_8UC1);
+//        imgCanny = new Mat(height, width, CvType.CV_8UC4);
+//        hierarchy = new Mat();
+//    }
+//
+//    @Override
+//    public void onCameraViewStopped() {
+//
+//        rgba.release();
+//        imgGray.release();
+//        imgCanny.release();
+//        hierarchy.release();
+//    }
+//
+//    @Override
+//    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
+//
+//        rgba = inputFrame.rgba();
+//        contours = new ArrayList<MatOfPoint>();
+//
+//        // Converting image from rgba to gray
+//        Imgproc.cvtColor(rgba, imgGray, Imgproc.COLOR_RGB2GRAY);
+//        // Canny edge detection
+//        Imgproc.Canny(imgGray, imgCanny, 50, 150);
+//
+//        // Finding contours
+//        Imgproc.findContours(imgCanny, contours, hierarchy, Imgproc.RETR_TREE,
+//                Imgproc.CHAIN_APPROX_SIMPLE, new Point(0, 0));
+//
+//        Mat drawing = Mat.zeros(imgCanny.size(), CvType.CV_8UC4);
+//
+//        for(int i=0; i< contours.size(); i++){
+//
+//            Scalar color = new Scalar(Math.random()*255,
+//                    Math.random()*255, Math.random()*255);
+//
+//            // Drawing contours
+//            Imgproc.drawContours(drawing, contours, i, color, 2, 8, hierarchy,
+//                    0, new Point() );
+//        }
+//
+//        hierarchy.release();
+////        Imgproc.drawContours(imgGray, contours, -1, new Scalar(Math.random()*255,
+////                Math.random()*255, Math.random()*255)); //, 2, 8, hierarchy, 0, new Point());
+//
+//        return drawing;
+//    }
 }
