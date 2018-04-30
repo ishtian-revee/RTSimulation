@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.WindowManager;
+import android.widget.ImageView;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
@@ -28,29 +29,30 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
 
-    // Field
+    // Fields
     private static final String TAG = "MainActivity";
+    private BaseLoaderCallback mOpenCVLoaderCallback = new BaseLoaderCallback(this) {
+        @Override
+        public void onManagerConnected(int status) {
+
+            switch (status){
+
+                case BaseLoaderCallback.SUCCESS:
+                    // TODO: start camera capture
+                    break;
+
+                default:
+                    super.onManagerConnected(status);
+                    break;
+            }
+        }
+    };
+
+    // surface view -> image view
+    private ImageView mMySurfaceView;
 
 //    JavaCameraView javaCameraView;
-    private PortraitCameraView portraitCameraView;
-    private BaseLoaderCallback loaderCallback;
-//    BaseLoaderCallback loaderCallback = new BaseLoaderCallback(this) {
-//        @Override
-//        public void onManagerConnected(int status) {
-//
-//            switch (status){
-//
-//                case BaseLoaderCallback.SUCCESS:
-//    //                        javaCameraView.enableView();
-//                    portraitCameraView.enableView();
-//                    break;
-//
-//                default:
-//                    super.onManagerConnected(status);
-//                    break;
-//            }
-//        }
-//    };
+//    private PortraitCameraView portraitCameraView;
 
     private Mat rgba;
     private Mat imgGray;
@@ -59,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     List<MatOfPoint> contours;
 
+    // static initialization of opencv library
     static {
         System.loadLibrary("opencv_java3");
     }
@@ -70,15 +73,17 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+        mMySurfaceView = findViewById(R.id.mySurfaceView);
+
 //        javaCameraView = findViewById(R.id.java_camera_view);
 //        javaCameraView.setVisibility(SurfaceView.VISIBLE);
 //        javaCameraView.setCvCameraViewListener(this);
 //        javaCameraView.enableFpsMeter();
 
-        portraitCameraView = findViewById(R.id.portrait_camera_view);
-        portraitCameraView.setVisibility(SurfaceView.VISIBLE);
-        portraitCameraView.setCvCameraViewListener(this);
-        portraitCameraView.enableFpsMeter();
+//        portraitCameraView = findViewById(R.id.portrait_camera_view);
+//        portraitCameraView.setVisibility(SurfaceView.VISIBLE);
+//        portraitCameraView.setCvCameraViewListener(this);
+//        portraitCameraView.enableFpsMeter();
 
         // Requesting for camera permission manually
         if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1){
@@ -102,24 +107,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 }
             }
         }
-
-        loaderCallback = new BaseLoaderCallback(this) {
-            @Override
-            public void onManagerConnected(int status) {
-
-                switch (status){
-
-                    case BaseLoaderCallback.SUCCESS:
-//                        javaCameraView.enableView();
-                        portraitCameraView.enableView();
-                        break;
-
-                    default:
-                        super.onManagerConnected(status);
-                        break;
-                }
-            }
-        };
     }
 
     @Override
@@ -131,11 +118,11 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 //
 //            javaCameraView.disableView();
 //        }
-
-        if(portraitCameraView != null){
-
-            portraitCameraView.disableView();
-        }
+//
+//        if(portraitCameraView != null){
+//
+//            portraitCameraView.disableView();
+//        }
     }
 
     @Override
@@ -147,11 +134,11 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 //
 //            javaCameraView.disableView();
 //        }
-
-        if(portraitCameraView != null){
-
-            portraitCameraView.disableView();
-        }
+//
+//        if(portraitCameraView != null){
+//
+//            portraitCameraView.disableView();
+//        }
     }
 
     @Override
@@ -162,12 +149,12 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         if(OpenCVLoader.initDebug()){
 
             Log.d(TAG, "OpenCV Successfully Loaded!");
-            loaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+            mOpenCVLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
         } else {
 
             Log.d(TAG, "OpenCV Not Loaded!");
             OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_1_0,
-                    this, loaderCallback);
+                    this, mOpenCVLoaderCallback);
         }
     }
 
