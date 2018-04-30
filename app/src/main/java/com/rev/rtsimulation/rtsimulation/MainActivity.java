@@ -2,6 +2,7 @@ package com.rev.rtsimulation.rtsimulation;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.ImageFormat;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
@@ -18,6 +19,8 @@ import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.JavaCameraView;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
+import org.opencv.android.Utils;
+import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -186,6 +189,79 @@ public class MainActivity extends AppCompatActivity implements CameraCapture.Cam
     @Override
     public void onUpdateFrame(byte[] data, int fps) {
 
+        // rotating current surface view -> image view
+        mMySurfaceView.setRotation(90);
+
+        // or : mat = Imgcodecs.imdecode(new MatOfByte(data), Imgcodecs.CV_LOAD_IMAGE_UNCHANGED); // not sure it work or not
+
+        // OpenCV primitive data types: CV_8UC1 -> 8 bits unsigned channel 1
+        Mat originalFrame = new Mat(mCameraCapture.previewHeight + mCameraCapture.previewHeight/2,
+                mCameraCapture.previewWidth, CvType.CV_8UC1);
+        originalFrame.put(0,0, data);
+
+        Mat rgbaFrame = new Mat(mCameraCapture.previewWidth, mCameraCapture.previewHeight, CvType.CV_8UC3);
+        // convert to rgba
+        Imgproc.cvtColor(originalFrame, rgbaFrame, Imgproc.COLOR_YUV2RGB_NV21);     // YUV NV21 format
+
+        // drawing fps value
+        Imgproc.putText(rgbaFrame, "FPS: " + fps, new Point(15,108), Core.FONT_HERSHEY_SIMPLEX,
+                0.8, new Scalar(200, 70), 2);
+
+        Mat grayFrame = new Mat(mCameraCapture.previewWidth, mCameraCapture.previewHeight, CvType.CV_8UC3);     // CV_8UC3 -> for gray conversion
+        // convert to gray
+        Imgproc.cvtColor(rgbaFrame, grayFrame, Imgproc.COLOR_RGB2GRAY);
+
+        Mat cannyFrame = new Mat(mCameraCapture.previewWidth, mCameraCapture.previewHeight, CvType.CV_8UC3);
+        // Canny edge detection
+        Imgproc.Canny(grayFrame, cannyFrame, 50, 150);
+
+        Mat hierarchy = new Mat(mCameraCapture.previewWidth, mCameraCapture.previewHeight, CvType.CV_8UC3);
+        contours = new ArrayList<MatOfPoint>();
+
+        // Finding contours
+        Imgproc.findContours(cannyFrame, contours, hierarchy, Imgproc.RETR_TREE,
+                Imgproc.CHAIN_APPROX_SIMPLE, new Point(0, 0));
+
+        // matrix set to all zeros
+        Mat drawing = Mat.zeros(cannyFrame.size(), CvType.CV_8UC3);
+        for(int i=0; i<contours.size(); i++){
+
+            // calculating random color codes
+            Scalar color = new Scalar(Math.random()*255,
+                    Math.random()*255, Math.random()*255);
+
+            // Drawing contours
+            Imgproc.drawContours(drawing, contours, i, color, 2, 8, hierarchy,
+                    0, new Point() );
+        }
+
+        // display on view ( need run on main thread )
+        updateSurfaceView(drawing);
+
+        // release all
+        originalFrame.release();
+        rgbaFrame.release();
+        grayFrame.release();
+        cannyFrame.release();
+        hierarchy.release();
+        drawing.release();
+    }
+
+    // this method updates the surface view for each frame
+    private void updateSurfaceView(Mat m){
+
+        // convert mat -> bitmap
+        final Bitmap outputBitmap = Bitmap.createBitmap(m.cols(), m.rows(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(m, outputBitmap);
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                // sets bitmap to the surface view -> image view
+                mMySurfaceView.setImageBitmap(outputBitmap);
+            }
+        });
     }
 
 //    @Override
