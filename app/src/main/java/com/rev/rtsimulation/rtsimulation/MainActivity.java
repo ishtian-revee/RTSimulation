@@ -2,6 +2,7 @@ package com.rev.rtsimulation.rtsimulation;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.ImageFormat;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -38,7 +39,8 @@ public class MainActivity extends AppCompatActivity implements CameraCapture.Cam
             switch (status){
 
                 case BaseLoaderCallback.SUCCESS:
-                    // TODO: start camera capture
+                    mOpenCVInited = true;
+                    startCameraCapture();
                     break;
 
                 default:
@@ -94,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements CameraCapture.Cam
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                     != PackageManager.PERMISSION_GRANTED) {
 
-                // Give first an explanation, if needed.
+                // Giving an explanation, if needed.
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                         Manifest.permission.CAMERA)) {
 
@@ -112,11 +114,13 @@ public class MainActivity extends AppCompatActivity implements CameraCapture.Cam
         }
     }
 
+    // to deal with when leaving the activity
     @Override
     protected void onPause() {
-
         super.onPause();
 
+        // TODO: stop camera
+
 //        if(javaCameraView != null){
 //
 //            javaCameraView.disableView();
@@ -128,10 +132,12 @@ public class MainActivity extends AppCompatActivity implements CameraCapture.Cam
 //        }
     }
 
+    // final call received before activity is destroyed
     @Override
     protected void onDestroy() {
-
         super.onDestroy();
+
+        // TODO: stop camera with clean
 
 //        if(javaCameraView != null){
 //
@@ -144,11 +150,12 @@ public class MainActivity extends AppCompatActivity implements CameraCapture.Cam
 //        }
     }
 
+    // activity is in front of all other activities
     @Override
     protected void onResume() {
-
         super.onResume();
 
+        // loads and initializes OpenCV library from within current application package
         if(OpenCVLoader.initDebug()){
 
             Log.d(TAG, "OpenCV Successfully Loaded!");
@@ -159,6 +166,21 @@ public class MainActivity extends AppCompatActivity implements CameraCapture.Cam
             OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_1_0,
                     this, mOpenCVLoaderCallback);
         }
+    }
+
+    private void startCameraCapture(){
+
+        // camera capture instance
+        mCameraCapture = new CameraCapture();
+        mCameraCapture.cameraCallback = this;
+
+        // init basic config
+        mCameraCapture.pictureFormat = ImageFormat.NV21;
+        mCameraCapture.previewWidth = 480;
+        mCameraCapture.previewHeight = 640;
+
+        mCameraCapture.initCameraDevice();
+        mCameraCapture.initCameraCapture();
     }
 
     @Override
