@@ -1,6 +1,6 @@
 # RTSimulation
 
-Partial implementation of Real Time Edge Detection Simulation using **OpenGL**
+Partial implementation of Real Time Edge Detection Simulation using **OpenCV**
 library in android. This repository contains only the edge and contour detection
 using computer vision. The output is to have what computer vision looks like
 after edge and contour detection.
@@ -9,7 +9,7 @@ after edge and contour detection.
 
 This general idea of this project is to have the taste of computer vision integrating
 in android. First to get the real time edge detection and contour detection
-using **OpenGL** modules for computer vision. After successfully detection edges
+using **OpenCV** modules for computer vision. After successfully detection edges
 need to implement some cool game type simulations.
 
 The simulation concept is something like this, after successfully detecting edges,
